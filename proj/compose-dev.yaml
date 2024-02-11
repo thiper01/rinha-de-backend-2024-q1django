@@ -1,4 +1,24 @@
-db:
+services:
+  api01: &api
+    entrypoint:
+    - sleep
+    - infinity
+    image: thiper01/api-djanguitos-rinha2024-q1
+    hostname: api01
+    init: true
+    volumes:
+    - type: bind
+      source: /var/run/docker.sock
+      target: /var/run/docker.sock
+    environment:
+      - DB_HOSTNAME=db
+      - PORT=3000
+    ports:
+      - "3001:3000"
+    depends_on:
+      - db
+
+  db:
     image: postgres:latest
     hostname: db
     environment:
