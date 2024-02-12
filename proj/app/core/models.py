@@ -1,3 +1,4 @@
+import asyncio
 from django.db import models
 # This is an auto-generated Django model module.
 # You'll have to do the following manually to clean this up:
@@ -39,3 +40,9 @@ class Transacoes(models.Model):
     class Meta:
         managed = False
         db_table = 'transacoes'
+
+async def get_info(id):
+    async with asyncio.TaskGroup() as tg:
+        gcli = tg.create_task(Clientes.objects.aget(id=id))
+        gsald = tg.create_task(Saldos.objects.aget(cliente=id))
+        return gcli.result(), gsald.result()
