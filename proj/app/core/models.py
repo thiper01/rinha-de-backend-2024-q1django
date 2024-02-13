@@ -7,7 +7,7 @@ from django.db import models
 
 
 class Clientes(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     nome = models.CharField(max_length=50, null=False)
     limite = models.IntegerField(null=False)
 
@@ -17,7 +17,7 @@ class Clientes(models.Model):
 
 
 class Saldos(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     cliente = models.OneToOneField(Clientes, models.CASCADE)
     valor = models.IntegerField(null=False)
 
@@ -27,7 +27,7 @@ class Saldos(models.Model):
 
 
 class Transacoes(models.Model):
-    id = models.IntegerField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     tipoChoices=[
         ("C", "Crédito"), 
         ("D", "Débito")]
@@ -45,4 +45,4 @@ async def get_info(id):
     async with asyncio.TaskGroup() as tg:
         gcli = tg.create_task(Clientes.objects.aget(id=id))
         gsald = tg.create_task(Saldos.objects.aget(cliente=id))
-        return gcli.result(), gsald.result()
+    return gcli.result(), gsald.result()
