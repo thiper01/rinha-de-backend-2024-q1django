@@ -32,24 +32,10 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
     'core.apps.CoreConfig',
 ]
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+MIDDLEWARE = []
 
 ROOT_URLCONF = 'app.urls'
 
@@ -83,6 +69,8 @@ DATABASES = {
         'PASSWORD': '123',
         'HOST': 'db',
         'PORT': '5432',
+        'CONN_MAX_AGE': 'None',
+        'CONN_HEALTH_CHECKS': 'True'
     },
     'OPTIONS': {
         'isolation_level': IsolationLevel.REPEATABLE_READ,
