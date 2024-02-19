@@ -7,4 +7,4 @@ COPY requirements.txt /app/
 RUN pip install -r requirements.txt
 COPY . /app/
 WORKDIR /app/app/
-CMD python manage.py runserver 0:3000
+CMD gunicorn app.wsgi 0.0.0.0:3000
