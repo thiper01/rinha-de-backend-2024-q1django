@@ -18,6 +18,15 @@ services:
     depends_on:
       - db
 
+  api02:
+    <<: *api
+    hostname: api02
+    environment:
+      - DB_HOSTNAME=db
+      - PORT=3000
+    ports:
+      - "3002:3000"
+
   db:
     image: postgres:latest
     hostname: db
