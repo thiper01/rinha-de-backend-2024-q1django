@@ -173,3 +173,4 @@ cython_debug/
 # Built Visual Studio Code Extensions
 *.vsix
 proj/.vscode/launch.json
+.vscode/launch.json
