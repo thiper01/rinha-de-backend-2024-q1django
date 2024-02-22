@@ -8,7 +8,13 @@ from django.core.exceptions import ValidationError
 
 def transacoes(request, id):
     if request.method == "POST":
-        body = json.loads(request.body)
+        try:
+            body = json.loads(request.body)
+        except:
+            response = HttpResponse()
+            response.status_code = 422
+            return response
+        
         valor_tran = body["valor"]
         tipo = body["tipo"]
         descr = body["descricao"]
@@ -23,11 +29,11 @@ def transacoes(request, id):
 
         transacao = Transacoes(cliente=cliente, valor=valor_tran, tipo=tipo, descricao=descr)
         try:
-            transacao.clean_fields(exclude=["realizada_em"])
+            transacao.clean_fields(exclude=["cliente","realizada_em"])
         except ValidationError as e:
             erro = " \n".join(e.messages)
             response = HttpResponse(erro)
-            response.status_code = 400
+            response.status_code = 422
             return response
 
         if tipo == "d":
