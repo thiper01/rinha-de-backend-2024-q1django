@@ -1,9 +1,10 @@
 import asyncio
 import json
-from .models import Transacoes, get_info, get_info
+from .models import Clientes, Saldos, Transacoes, get_info, get_info
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.core.exceptions import ValidationError
+from django.db import connection, transaction
 
 
 def transacoes(request, id):
@@ -18,34 +19,36 @@ def transacoes(request, id):
         valor_tran = body["valor"]
         tipo = body["tipo"]
         descr = body["descricao"]
-        try:
-            # cliente = Clientes.objects.get(id=id)
-            # saldo = Saldos.objects.get(cliente=id).valor
-            cliente, saldo = asyncio.run(get_info(id))
-        except:
-            response = HttpResponse()
-            response.status_code = 404
-            return response
-
-        transacao = Transacoes(cliente=cliente, valor=valor_tran, tipo=tipo, descricao=descr)
-        try:
-            transacao.clean_fields(exclude=["cliente","realizada_em"])
-        except ValidationError as e:
-            erro = " \n".join(e.messages)
-            response = HttpResponse(erro)
-            response.status_code = 422
-            return response
-
-        if tipo == "d":
-            if (saldo.valor+cliente.limite)-valor_tran < 0:
+        with transaction.atomic(), connection.cursor() as cursor:
+            cursor.execute("LOCK TABLE transacoes IN ACCESS EXCLUSIVE MODE;")
+            try:
+                cliente = Clientes.objects.get(id=id)
+                saldo = Saldos.objects.select_for_update().get(cliente=id)
+                # cliente, saldo = asyncio.run(get_info(id))
+            except:
                 response = HttpResponse()
+                response.status_code = 404
+                return response
+
+            transacao = Transacoes(cliente=cliente, valor=valor_tran, tipo=tipo, descricao=descr)
+            try:
+                transacao.clean_fields(exclude=["cliente","realizada_em"])
+            except ValidationError as e:
+                erro = " \n".join(e.messages)
+                response = HttpResponse(erro)
                 response.status_code = 422
                 return response
-            else:
-                saldo.valor -= valor_tran
-                saldo.save()
-        
-        transacao.save()
+
+            if tipo == "d":
+                if (saldo.valor+cliente.limite)-valor_tran < 0:
+                    response = HttpResponse()
+                    response.status_code = 422
+                    return response
+                else:
+                    saldo.valor -= valor_tran
+                    saldo.save()
+            
+            transacao.save()
         response = JsonResponse({
             "limite": cliente.limite,
             "saldo": saldo.valor})
@@ -59,16 +62,17 @@ def transacoes(request, id):
 
 def extrato(request, id):
     if request.method == "GET":
-        try:
-            # cliente = Clientes.objects.get(id=id)
-            # saldo = Saldos.objects.get(cliente=id)
-            cliente, saldo = asyncio.run(get_info(id))
-        except:
-            response = HttpResponse()
-            response.status_code = 404
-            return response
-            
-        last_tran = list(Transacoes.objects.filter(cliente=id).order_by("realizada_em")[:10].values("valor", "tipo", "descricao", "realizada_em"))
+        with transaction.atomic():
+            try:
+                # cliente = Clientes.objects.get(id=id)
+                # saldo = Saldos.objects.get(cliente=id)
+                cliente, saldo = asyncio.run(get_info(id))
+            except:
+                response = HttpResponse()
+                response.status_code = 404
+                return response
+                
+            last_tran = list(Transacoes.objects.filter(cliente=id).order_by("realizada_em")[:10].values("valor", "tipo", "descricao", "realizada_em"))
         response = JsonResponse(
             {
                 "saldo": {
