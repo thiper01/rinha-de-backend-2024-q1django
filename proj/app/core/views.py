@@ -20,7 +20,7 @@ def transacoes(request, id):
         tipo = body["tipo"]
         descr = body["descricao"]
         with transaction.atomic(), connection.cursor() as cursor:
-            cursor.execute("LOCK TABLE transacoes IN ACCESS EXCLUSIVE MODE;")
+            # cursor.execute("LOCK TABLE transacoes IN ACCESS EXCLUSIVE MODE;")
             try:
                 # cliente = Clientes.objects.get(id=id)
                 cliente = get_cliente(id)
