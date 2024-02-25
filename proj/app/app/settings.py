@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-8j#dfu=catinyjhg$hscjewts%_@vk$rre)nxdng2!^c$&(lt7'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -39,9 +39,13 @@ CACHES = {
 
 INSTALLED_APPS = [
     'core.apps.CoreConfig',
+    "django.contrib.staticfiles",
+    "debug_toolbar",
 ]
 
-MIDDLEWARE = []
+MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
+    ]
 
 ROOT_URLCONF = 'app.urls'
 
@@ -73,7 +77,7 @@ DATABASES = {
         'NAME': 'rinha',
         'USER': 'admin',
         'PASSWORD': '123',
-        'HOST': 'db',
+        'HOST': 'localhost',
         'PORT': '5432',
         'CONN_MAX_AGE': None,
         'CONN_HEALTH_CHECKS': 'True'
@@ -124,3 +128,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
+DISABLE_PANELS = {
+    "debug_toolbar.panels.redirects.RedirectsPanel"
+}
+
+PROFILER_THRESHOLD_RATIO = 0
