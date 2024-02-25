@@ -1,30 +1,10 @@
-import asyncio
 from django.db import models
 from django.core.validators import MaxLengthValidator
-from django.core.exceptions import ValidationError
+from .customModelFields import StrictIntegerField
 # This is an auto-generated Django model module.
 # You'll have to do the following manually to clean this up:
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
-
-class StrictIntegerField(models.fields.IntegerField):
-    def to_python(self, value):
-        if value is None:
-            return value
-        if not isinstance(value, int):
-            raise ValidationError(
-                self.error_messages["invalid"],
-                code="invalid",
-                params={"value": value},
-            )
-        try:
-            return int(value)
-        except (TypeError, ValueError):
-            raise ValidationError(
-                self.error_messages["invalid"],
-                code="invalid",
-                params={"value": value},
-            )
 
 class Clientes(models.Model):
     id = models.AutoField(primary_key=True)
@@ -60,9 +40,3 @@ class Transacoes(models.Model):
     class Meta:
         managed = False
         db_table = 'transacoes'
-
-async def get_info(id):
-    async with asyncio.TaskGroup() as tg:
-        gcli = tg.create_task(Clientes.objects.aget(id=id))
-        gsald = tg.create_task(Saldos.objects.aget(cliente=id))
-    return gcli.result(), gsald.result()

@@ -28,6 +28,12 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*']
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "TIMEOUT": None,
+    }
+}
 
 # Application definition
 
