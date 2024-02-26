@@ -1,9 +1,9 @@
 import json
-from .models import Clientes, Saldos, Transacoes
+from .models import Saldos, Transacoes
 from django.http import HttpResponse, JsonResponse
 from django.utils import timezone
 from django.core.exceptions import ValidationError
-from django.db import connection, transaction
+from django.db import transaction
 from .utils import get_cliente, get_info
 
 
@@ -19,8 +19,7 @@ def transacoes(request, id):
         valor_tran = body["valor"]
         tipo = body["tipo"]
         descr = body["descricao"]
-        with transaction.atomic(), connection.cursor() as cursor:
-            # cursor.execute("LOCK TABLE transacoes IN ACCESS EXCLUSIVE MODE;")
+        with transaction.atomic():
             try:
                 # cliente = Clientes.objects.get(id=id)
                 cliente = get_cliente(id)
