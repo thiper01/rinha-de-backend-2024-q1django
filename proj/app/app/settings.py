@@ -45,21 +45,7 @@ MIDDLEWARE = []
 
 ROOT_URLCONF = 'app.urls'
 
-TEMPLATES = [
-    {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
-            ],
-        },
-    },
-]
+TEMPLATES = []
 
 WSGI_APPLICATION = 'app.wsgi.application'
 
@@ -73,34 +59,23 @@ DATABASES = {
         'NAME': 'rinha',
         'USER': 'admin',
         'PASSWORD': '123',
-        'HOST': 'db',
+        'HOST': 'pgbouncer',
         'PORT': '5432',
-        'CONN_MAX_AGE': None,
-        'CONN_HEALTH_CHECKS': 'True'
+        # 'CONN_MAX_AGE': None,
+        # 'CONN_HEALTH_CHECKS': 'True',
+        'DISABLE_SERVER_SIDE_CURSORS': True
     },
-    'OPTIONS': {
-        'isolation_level': IsolationLevel.REPEATABLE_READ,
-    },
+    # 'OPTIONS': {
+    #     'isolation_level': IsolationLevel.REPEATABLE_READ,
+    # },
+
 }
 
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
-AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
-]
+AUTH_PASSWORD_VALIDATORS = []
 
 
 # Internationalization

@@ -1,6 +1,7 @@
-import asyncio
+# import asyncio
 from django.core.cache import cache
-from .models import Clientes, Saldos
+from .models import Clientes, Saldos, Transacoes
+from django.shortcuts import get_object_or_404
 
 
 def get_cliente(key):
@@ -8,15 +9,9 @@ def get_cliente(key):
     if cached_cliente is not None:
         return cached_cliente
     
-    cliente = Clientes.objects.get(id=key)
+    cliente = get_object_or_404(Clientes, id=key)
     cache.set(str(key) , cliente, 3600)
     return cliente
-
-async def get_info_async(id):
-    async with asyncio.TaskGroup() as tg:
-        gcli = tg.create_task(Clientes.objects.aget(id=id))
-        gsald = tg.create_task(Saldos.objects.aget(cliente=id))
-    return gcli.result(), gsald.result()
 
 def get_info(id):
     cached_cliente = cache.get(str(id))
@@ -24,6 +19,10 @@ def get_info(id):
         saldo = Saldos.objects.get(cliente=id)
         return cached_cliente, saldo
     
-    cliente, saldo = asyncio.run(get_info_async(id))
+    saldo = Saldos.objects.select_related("cliente").get(cliente=id)
+    cliente = saldo.cliente
     cache.set(str(id) , cliente, 3600)
     return cliente, saldo
+
+def get_last_tran(id):
+    return list(Transacoes.objects.filter(cliente=id).order_by("-realizada_em")[:10].values("valor", "tipo", "descricao", "realizada_em"))
